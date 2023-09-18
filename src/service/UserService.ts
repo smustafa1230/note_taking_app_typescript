@@ -2,17 +2,25 @@ import { UserReturnType, User, UserRequestType } from "@/entities/User";
 import "reflect-metadata";
 import { Service } from "typedi";
 import logger from "./../logger";
-import AppDataSource from "@/orm";
 import { Repository, FindOptionsWhere } from "typeorm";
 import { NextFunction, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import { SECRET_KEY } from "@/config";
 import { CustomError } from "@/middleware/exception/CustomError";
+import AppDataSource from "@/config/AppDataSource";
 
 @Service()
 export class UserService {
-  userRepository: Repository<User> = AppDataSource.getRepository(User);
-  constructor(private customError: CustomError) {}
+  // userRepository: Repository<User> = AppDataSource.getRepository(User);
+  userRepository: Repository<User>;
+  constructor(
+    private readonly appDataSource: AppDataSource,
+    private customError: CustomError
+  ) {
+    this.userRepository = this.appDataSource
+      .getConnection()
+      .getRepository(User);
+  }
   async signup(body: UserRequestType): Promise<UserReturnType> {
     try {
       logger.info("body: ", body);

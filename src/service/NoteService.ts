@@ -2,8 +2,8 @@ import { UserReturnType, User } from "@/entities/User";
 import "reflect-metadata";
 import { Service } from "typedi";
 import logger from "../logger";
-import AppDataSource from "@/orm";
-import { FindOptionsWhere, Repository, SimpleConsoleLogger } from "typeorm";
+import AppDataSource from "@/config/AppDataSource";
+import { FindOptionsWhere, Repository } from "typeorm";
 import { NextFunction, Response } from "express";
 import { CustomError } from "@/middleware/exception/CustomError";
 import { Note, NoteReturnType } from "@/entities/Note";
@@ -12,11 +12,16 @@ import { REDIS_NOTES_KEY } from "@/utils/Constant";
 
 @Service()
 export class NoteService {
-  noteRepository: Repository<Note> = AppDataSource.getRepository(Note);
+  noteRepository: Repository<Note>;
   constructor(
+    private readonly appDataSource: AppDataSource,
     private customError: CustomError,
     private redisUtils: RedisUtils
-  ) {}
+  ) {
+    this.noteRepository = this.appDataSource
+      .getConnection()
+      .getRepository(Note);
+  }
   async create(
     body: NoteReturnType,
     res: Response,

@@ -4,10 +4,12 @@ import { CustomError } from "../../middleware/exception/CustomError"; // Adjust 
 import { FindOptions, FindOptionsWhere, Repository } from "typeorm";
 import { NextFunction, Response } from "express";
 import * as jwt from "jsonwebtoken";
-
+import AppDataSource from "./../../config/AppDataSource";
 // Import ts-mockito for mocking
 import { mock, instance, when, verify } from "ts-mockito";
+import Container from "typedi";
 
+jest.mock("./../../config/AppDataSource");
 const user: UserRequestType = {
   // Define user data here
   first_name: "salman",
@@ -15,27 +17,36 @@ const user: UserRequestType = {
   email: "test@mgail.com",
   password: "test",
 };
-const mockDS = {
-  initialize: jest.fn(),
-};
 
-jest.mock("typeorm", () => {
-  return {
-    DataSource: jest.fn().mockImplementation(() => mockDS),
-  };
-});
 describe("UserService", () => {
   let userService: UserService;
   let userRepository: Repository<User>;
   let customError: CustomError;
+  let appDataSourceMock: jest.Mocked<AppDataSource>;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     // Create mocks for dependencies
-    userRepository = mock(Repository);
+    userRepository = mock<Repository<User>>();
+
     customError = mock(CustomError);
+    // appDataSource = Container.get(AppDataSource);
+    appDataSourceMock = new AppDataSource() as jest.Mocked<AppDataSource>;
+
+    const connectionMock = appDataSourceMock.getConnection();
+    // Mock the methods or properties of AppDataSource as needed
+    appDataSourceMock.getConnection.mockReturnValue(connectionMock);
+    when(appDataSourceMock.getConnection()).thenReturn(
+      instance(connectionMock)
+    );
+
+    // Mock the getRepository method of the Connection to return the mock UserRepository
+
+    when(appDataSourceMock.getConnection().getRepository(User)).thenReturn(
+      userRepository
+    );
 
     // Create an instance of UserService with mocked dependencies
-    userService = new UserService(instance(customError));
+    userService = new UserService(appDataSourceMock, instance(customError));
     userService.userRepository = instance(userRepository);
   });
 
