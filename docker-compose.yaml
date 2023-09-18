@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  # Node.js Express Application
+  app:
+    build:
+      context: ./
+
+    ports:
+      - "5000:3000"
+    volumes:
+      - ./src:/app
+    depends_on:
+      - db
+      - redis
+    environment:
+      NODE_ENV: development
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: smustafa
+      DB_PASSWORD: admin123
+      DB_DATABASE: note_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SECRET_KEY: secretKeyNoteApp
+    command: ["npm", "start"]
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_USER: smustafa
+      MYSQL_PASSWORD: admin123
+      MYSQL_DATABASE: note_db
+
+  # Redis Cache
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
