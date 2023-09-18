@@ -13,20 +13,40 @@ const userController = Container.get(UserController);
  * @swagger
  * /api/auth/signup:
  *   post:
- *     summary: signup
- *     description: signup users
+ *     summary: Create a new user
+ *     description: Create a new user with the provided details.
  *     parameters:
  *       - in: body
- *         name: body
- *         description: User signup information in JSON format
+ *         name: user
+ *         description: The user object containing user details.
  *         required: true
  *         schema:
- *           $ref: '#/definitions/UserSignupRequest'
+ *           type: object
+ *           properties:
+ *             first_name:
+ *               type: string
+ *               description: The first name of the user.
+ *             last_name:
+ *               type: string
+ *               description: The last name of the user.
+ *             email:
+ *               type: string
+ *               format: email
+ *               description: The email address of the user.
+ *             password:
+ *               type: string
+ *               format: password
+ *               description: The password for the user.
+ *         example:
+ *           first_name: John
+ *           last_name: Doe
+ *           email: johndoe@example.com
+ *           password: secret
  *     responses:
- *       200:
- *         description: Successful response.
- *         schema:
- *           $ref: '#/definitions/UserSignupResponse'
+ *       201:
+ *         description: User created successfully.
+ *       400:
+ *         description: Bad request. Invalid input data.
  */
 router.post(
   "/signup",
@@ -37,6 +57,37 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: login
+ *     description: login user to get token
+ *     parameters:
+ *       - in: body
+ *         name: user
+ *         description: The user object containing user details.
+ *         required: true
+ *         schema:
+ *           type: object
+ *           properties:
+ *             email:
+ *               type: string
+ *               format: email
+ *               description: The email address of the user.
+ *             password:
+ *               type: string
+ *               format: password
+ *               description: The password for the user.
+ *         example:
+ *           email: johndoe@example.com
+ *           password: secret
+ *     responses:
+ *       201:
+ *         description: token in response.
+ *       400:
+ *         description: Bad request. Invalid input data.
+ */
 router.post(
   "/login",
   loginUserValidationRules,

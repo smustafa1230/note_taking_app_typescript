@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 COPY . ./
-RUN rm -rf dist
+
 # Build your application (adjust this command to match your project's build process)
 RUN npm run build
 
