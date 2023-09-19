@@ -5,3 +5,8 @@
 5. Access the application on localhost:5000
 6. you can access swagger on localhost:5000/api-docs to know about the endpoints
 7. Create the user and the login with the credentials to access the jwt.
+
+To run test:
+run following command to run test for userservice only.
+
+npx jest

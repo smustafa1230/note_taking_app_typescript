@@ -17,9 +17,7 @@ export class UserService {
     private readonly appDataSource: AppDataSource,
     private customError: CustomError
   ) {
-    this.userRepository = this.appDataSource
-      .getConnection()
-      .getRepository(User);
+    this.userRepository = this.appDataSource.getRepo(User);
   }
   async signup(body: UserRequestType): Promise<UserReturnType> {
     try {

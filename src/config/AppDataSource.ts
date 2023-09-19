@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import { DataSource } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE } from "@/config";
 
 @Service()
@@ -36,6 +36,9 @@ export class AppDataSource {
 
   getConnection(): DataSource {
     return this.connection;
+  }
+  getRepo(clazz: any): Repository<any> {
+    return this.connection.getRepository(clazz);
   }
 }
 
